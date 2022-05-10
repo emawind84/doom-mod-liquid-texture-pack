@@ -1,0 +1,100 @@
+gameinfo
+{
+	AddEventHandlers = "WaterHandler"
+	PrecacheTextures =
+	//WATER//
+	"LWFLAT1",
+	"LWFLAT2",
+	
+	//WATERFALL//
+	"LWFALL1",
+	"LWFALL2",
+	
+	//BLOOD//
+	"LBFLAT1",
+	"LBFLAT2",
+	
+	//BLOODFALL//
+	"LBFALL1",
+	"LBFALL2",
+	
+	//SLIME//
+	"LSFLAT1",
+	"LSFLAT2",
+	
+	//SLIMEFALL//
+	"LSFALL1",
+	"LSFALL2",
+	
+	//TOXIC//
+	"LTFLAT1",
+	"LTFLAT2",
+	
+	//TOXICFALL//
+	"LTFALL1",
+	"LTFALL2",
+	
+	//LAVA//
+	"LLFLAT1",
+	"LLFLAT2",
+	
+	//LAVAFALL//
+	"LLFALL1",
+	"LLFALL2",
+	
+	//SHADER TEXTURES//
+	//REFLECTION//
+	"liquid1.png",
+	"flatreflection.png",
+	
+	//NORMALS//
+	"WaterN.png",
+	"WaterfallN.png",
+	"toxiclayerN.png",
+	"toxicmasknormal.png",
+	"ToxicfallmaskN.png",
+	"lavaslagN.png",
+	"lavamasknormal.png",
+	"LavafalllayerN.png",
+	"LavalayerN.png",
+	
+	//PARALLAX//
+	"WaterD.png",
+	"LFallDM.png",
+	
+	//OVERLAY//
+	"LFfoam.png",
+	
+	//SPECULAR//
+	"Waterspec.png",
+	"Bloodspec.png",
+	"Slimespec.png",
+	
+	//WATER//
+	"Waterflat.png",
+	
+	//BLOOD//
+	"Bloodflat.png",
+	
+	//SLIME//
+	"Slimeflat.png",
+	
+	//TOXIC//
+	"toxic.png",
+	"toxiclayer.png",
+	"Toxicmask.png",
+	"Toxicfallmask.png",
+	
+	//LAVA//
+	"lava.png",
+	"lavaslag.png",
+	"lavaslagglow.png",
+	"lavarockmask.png",
+	"lavafallrockmask.png"
+	
+	PrecacheClasses =
+	"LTPWaterSplashChunk",
+	"LTPWaterSplashBase",
+	"Waterripple",
+	"LTPLavaSmoke"
+}

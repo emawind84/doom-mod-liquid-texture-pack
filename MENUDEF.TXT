@@ -1,0 +1,29 @@
+
+AddOptionMenu "OptionsMenu"
+{
+	Submenu "Liquid Texture Pack Options", "LTPOptions" 
+}
+
+OptionMenu "LTPOptions" 
+{
+	Title "Liquid Texture Pack Options"
+	StaticText " "
+	Option "Enable Small Splash Particles", "LTP_Smallsplash", "LTPYesOrNo"
+	Option "Enable Large Splash Particles", "LTP_Largesplash", "LTPYesOrNo"
+	Option "Large Splash Size", "LTP_Largesplashsize", "LsplashYesOrNo"
+	StaticText " "
+	StaticText "Underwater Shader"
+	Slider "Shader Effect Size (Fraction of screen)", "uw_effectsize", 0, 0.1, 0.005, 3
+}
+
+OptionValue "LTPYesOrNo"
+{
+	0, "No"
+	1, "Yes"
+}
+
+OptionValue "LsplashYesOrNo"
+{
+	0, "Medium"
+	1, "Large"
+}

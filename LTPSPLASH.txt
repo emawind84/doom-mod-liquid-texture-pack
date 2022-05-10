@@ -1,0 +1,17 @@
+#library "exploder"
+#include "zcommon.acs"
+
+Script "LTPLargeSplash" (VOID)
+{
+      SetResultValue (GetCvar("LTP_Largesplash")); 
+}
+
+Script "LTPSmallSplash" (VOID)
+{
+      SetResultValue (GetCvar("LTP_Smallsplash")); 
+}
+
+Script "LTPLargesplashsize" (VOID)
+{
+      SetResultValue (GetCvar("LTP_Largesplashsize")); 
+}

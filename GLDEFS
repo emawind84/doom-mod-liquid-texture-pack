@@ -1,0 +1,398 @@
+////////////////////UNDERWATER SHADER///////////////////////////////////////////
+
+
+HardwareShader PostProcess scene {
+	Name "watershader"
+	Shader "shaders/Water.frag" 330
+	Uniform float waterFactor
+	Uniform float timer // placeholder?
+}
+
+HardwareShader PostProcess scene {
+	Name "waterzoomshader"
+	Shader "shaders/WaterZoom.frag" 330
+	Uniform float zoomFactor
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////WATER////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LWFLAT1 
+{ 
+	define WATER//water tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Waterspec.png" 
+	texture reflection "textures/Materials/Reflection/liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Waterflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LWFLAT2 
+{ 
+	define WATER//water tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Waterspec.png" 
+	texture reflection "textures/Materials/Reflection/liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Waterflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////WATER FALL////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+material texture LWFALL1 
+{ 
+	define WATER//water tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Waterspec.png" 
+	texture reflection "textures/Materials/Reflection/liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Waterflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LWFALL2 
+{ 
+	define WATER//water tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Waterspec.png" 
+	texture reflection "textures/Materials/Reflection/liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Waterflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////BLOOD////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LBFLAT1 
+{ 
+	define BLOOD//blood tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Bloodspec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Bloodflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LBFLAT2 
+{ 
+	define BLOOD//blood tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Bloodspec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Bloodflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//////////////BLOODFALL////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+material texture LBFALL1 
+{ 
+	define BLOOD//blood tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"		
+	specular "textures/Materials/Specular/Bloodspec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Bloodflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LBFALL2 
+{ 
+	define BLOOD//blood tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"		
+	specular "textures/Materials/Specular/Bloodspec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Bloodflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////SLIME////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LSFLAT1 
+{ 
+	define SLIME//slime tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Slimespec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Slimeflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LSFLAT2 
+{ 
+	define SLIME//slime tint RGB color
+	shader "shaders/liquidflatshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Slimespec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture Diffuse "textures/Materials/diffuse/Slimeflat.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////SLIMEFALL////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LSFALL1 
+{ 
+	define SLIME//slime tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Slimespec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Slimeflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+material texture LSFALL2 
+{ 
+	define SLIME//slime tint RGB color
+	shader "shaders/liquidfallshader.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/WaterN.png"	
+	specular "textures/Materials/Specular/Slimespec.png" 
+	texture reflection "textures/Materials/Reflection/Liquid1.png"
+	texture foamlayer "textures/Materials/diffuselayer/LFfoam.png"
+	texture Diffuse "textures/Materials/diffuse/Slimeflat.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	specularlevel "6"
+	glossiness "300"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//////////TOXIC/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LTFLAT1 
+{ 
+	shader "shaders/Toxicflat.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/toxiclayerN.png"	
+	specular "textures/Materials/Diffuselayer/toxiclayer.png"
+	texture reflection "textures/Materials/Reflection/flatreflection.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/Toxicmask.png"
+	texture Diffuse "textures/Materials/diffuse/toxic.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/toxicmasknormal.png"
+	specularlevel "8"
+	glossiness "10"
+}
+
+material texture LTFLAT2 
+{ 
+	shader "shaders/Toxicflat.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/toxiclayerN.png"	
+	specular "textures/Materials/Diffuselayer/toxiclayer.png"
+	texture reflection "textures/Materials/Reflection/flatreflection.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/Toxicmask.png"
+	texture Diffuse "textures/Materials/diffuse/toxic.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/toxicmasknormal.png"
+	specularlevel "8"
+	glossiness "10"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////TOXICFALL///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LTFALL1 
+{ 
+	shader "shaders/Toxicfall.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/toxiclayerN.png"	
+	specular "textures/Materials/Diffuselayer/toxiclayer.png"
+	texture reflection "textures/Materials/Reflection/flatreflection.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/Toxicfallmask.png"
+	texture Diffuse "textures/Materials/diffuse/toxic.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/ToxicfallmaskN.png"
+	specularlevel "8"
+	glossiness "10"
+}
+
+material texture LTFALL2 
+{ 
+	shader "shaders/Toxicfall.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/toxiclayerN.png"	
+	specular "textures/Materials/Diffuselayer/toxiclayer.png"
+	texture reflection "textures/Materials/Reflection/flatreflection.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/Toxicfallmask.png"
+	texture Diffuse "textures/Materials/diffuse/toxic.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/ToxicfallmaskN.png"
+	specularlevel "8"
+	glossiness "10"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////LAVA/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LLFLAT1 
+{ 
+	shader "shaders/Lavaflat.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/lavaslagN.png"	
+	specular "textures/Materials/Diffuselayer/lavaslag.png"
+	texture Diffusedistortion "textures/Materials/normal/LavalayerN.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/lavarockmask.png"
+	texture Diffuse "textures/Materials/diffuse/lava.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/lavamasknormal.png"
+	specularlevel "5"
+	glossiness "1"
+}
+
+material texture LLFLAT2 
+{ 
+	shader "shaders/Lavaflat.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/lavaslagN.png"	
+	specular "textures/Materials/Diffuselayer/lavaslag.png"
+	texture Diffusedistortion "textures/Materials/normal/LavalayerN.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/lavarockmask.png"
+	texture Diffuse "textures/Materials/diffuse/lava.png"
+	texture Parallax "textures/Materials/Parallax/WaterD.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/lavamasknormal.png"
+	specularlevel "5"
+	glossiness "1"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////LAVAFALL/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+material texture LLFALL1 
+{ 
+	shader "shaders/Lavafall.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/lavaslagN.png"	
+	specular "textures/Materials/Diffuselayer/lavaslag.png"
+	texture Diffusedistortion "textures/Materials/normal/LavafalllayerN.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/lavafallrockmask.png"
+	texture Diffuse "textures/Materials/diffuse/lava.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/lavamasknormal.png"
+	specularlevel "5"
+	glossiness "1"
+}
+
+material texture LLFALL2 
+{ 
+	shader "shaders/Lavafall.fp"
+	normal "TEXTURES/MATERIALS/NORMAL/lavaslagN.png"	
+	specular "textures/Materials/Diffuselayer/lavaslag.png"
+	texture Diffusedistortion "textures/Materials/normal/LavafalllayerN.png"
+	texture Diffusemask "textures/Materials/Diffuselayermask/lavafallrockmask.png"
+	texture Diffuse "textures/Materials/diffuse/lava.png"
+	texture Parallax "textures/Materials/Parallax/LFallDM.png"
+	texture layermasknormal "TEXTURES/MATERIALS/NORMAL/lavamasknormal.png"
+	specularlevel "5"
+	glossiness "1"
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////GLOW/////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+GLOW
+{					 //R|G|B ,brightness 0-255
+	Texture "BFALL1", 000000, 0
+	Texture "BFALL2", 000000, 0
+	Texture "BFALL3", 000000, 0
+	Texture "BFALL4", 000000, 0
+	Texture "WFALL1", 000000, 0
+	Texture "WFALL2", 000000, 0
+	Texture "WFALL3", 000000, 0
+	Texture "WFALL4", 000000, 0
+	Texture "FWATER1", 000000, 0
+	Texture "FWATER2", 000000, 0
+	Texture "FWATER3", 000000, 0
+	Texture "FWATER4", 000000, 0
+	Texture "NUKAGE1", 059900, 255
+	Texture "NUKAGE2", 059900, 255
+	Texture "NUKAGE3", 059900, 255
+	Texture "NUKAGE4", 059900, 255
+	Texture "BLOOD1", 000000, 0
+	Texture "BLOOD2", 000000, 0
+	Texture "BLOOD3", 000000, 0
+	Texture "FIRELAV2", 000000, 0
+	Texture "SLIME01", 000000, 0
+	Texture "SLIME02", 000000, 0
+	Texture "SLIME03", 000000, 0
+	Texture "SLIME04", 000000, 0
+	Texture "SLIME05", 000000, 0
+	Texture "SLIME06", 000000, 0
+	Texture "SLIME07", 000000, 0
+	Texture "SLIME08", 000000, 0
+	Texture "SFALL1", 059900, 255
+	Texture "SFALL2", 059900, 255
+	Texture "SFALL3", 059900, 255
+	Texture "SFALL4", 059900, 255
+	Texture "LAVA1", 995000, 255
+	Texture "LAVA2", 995000, 255
+	Texture "LAVA3", 995000, 255
+	Texture "LAVA4", 995000, 255
+	
+	
+	//TOXIC	
+	Texture "LPNuke", 059900, 255 // LTP RESOURCE FILE
+	Texture "LTFLAT1", 059900, 255 // LTP RESOURCE FILE
+	Texture "LTFLAT2", 059900, 255 // LTP RESOURCE FILE
+	
+	//TOXIC FALL
+	Texture "LPNukeF", 059900, 255 // LTP RESOURCE FILE
+	Texture "LTFALL1", 059900, 255 // LTP RESOURCE FILE
+	Texture "LTFALL2", 059900, 255 // LTP RESOURCE FILE
+	
+	//LAVA
+	Texture "LPLAVA", 995000, 255 //LTP RESOURCE FILE
+	Texture "LLFLAT1", 995000, 255 //LTP RESOURCE FILE
+	Texture "LLFLAT2", 995000, 255 //LTP RESOURCE FILE
+	
+	//LAVAFALL
+	Texture "LPLavaF", 995000, 255 //LTP RESOURCE FILE
+	Texture "LLFALL1", 995000, 255 //LTP RESOURCE FILE
+	Texture "LLFALL2", 995000, 255 //LTP RESOURCE FILE
+}
+
+
+

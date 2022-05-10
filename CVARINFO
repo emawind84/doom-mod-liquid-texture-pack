@@ -1,0 +1,3 @@
+server int LTP_Largesplash = 1;
+server int LTP_Smallsplash = 1;
+server int LTP_Largesplashsize = 1;

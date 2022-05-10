@@ -1,0 +1,154 @@
+//////////////////////credits to enjay on zdoom fourm's for making the splash.pk3 a downloadble base flie.----- https://forum.zdoom.org/viewtopic.php?f=37&t=35547 -------
+
+splash Water
+{
+	smallclass		LTPWaterSplashBase
+	smallclip		0
+	smallsound		world/watersplashsmall
+	baseclass		LTPWaterSplashChunk
+	sound			world/watersplash
+	NoAlert
+}
+
+splash Blood
+{
+	smallclass		LTPBloodBase
+	smallclip		0
+	smallsound		world/sludgegloopsmall
+	baseclass		LTPBloodChunk
+	sound			world/sludgegloop
+	NoAlert
+}
+
+splash Slime
+{
+	smallclass		LTPSlimeBrownBase
+	smallclip		0
+	smallsound		world/sludgegloopsmall
+	baseclass		LTPSlimeBrownChunk
+	sound			world/sludgegloop
+	NoAlert
+}
+
+splash nukage
+{
+	smallclass		LTPToxicBase
+	smallclip		0
+	smallsound		world/lavasizzlesmall
+	baseclass		LTPToxicChunk
+	sound			world/lavasizzle
+	NoAlert
+}
+
+splash Lava
+{
+	smallclass		LTPLavaBase
+	smallclip		0
+	smallsound		world/lavasizzlesmall
+	baseclass		LTPLavaChunk
+	sound			world/lavasizzle
+	NoAlert
+}
+
+//////////////////////////////////////////////////////
+
+Terrain	 nukage
+{
+	splash			nukage
+	footclip		10
+	liquid
+}
+
+Terrain	Water
+{
+	splash			Water
+	footclip		10
+	liquid
+}
+
+Terrain	Lava
+{
+	splash			Lava
+	footclip		10
+	liquid
+}
+
+Terrain	Blood
+{
+	splash			Blood
+	footclip		10
+	liquid
+}
+
+Terrain Slime
+{
+	splash			Slime
+	footclip		10
+	liquid
+}
+
+/////////////////////////////////////////////////////
+
+// WATER 
+floor FWATER1 Water
+floor FWATER2 Water
+floor FWATER3 Water
+floor FWATER4 Water
+floor LPWATER Water//LTP
+
+//WATERFALL
+floor WFALL1 Water
+floor WFALL2 Water
+floor WFALL3 Water
+floor WFALL4 Water
+floor LPWATERF Water//LTP
+
+//BLOOD
+floor BLOOD1 Blood
+floor BLOOD2 Blood
+floor BLOOD3 Blood
+floor LPBLOOD Blood//LTP
+
+//BLODFALL
+floor BFALL1 Blood
+floor BFALL2 Blood
+floor BFALL3 Blood
+floor BFALL4 Blood
+floor LPBLOODF Blood//LTP
+
+//TOXIC
+floor NUKAGE1 nukage
+floor NUKAGE2 nukage
+floor NUKAGE3 nukage
+floor LPNUKE nukage//LTP
+
+//TOXICFALL
+floor SFALL1 nukage
+floor SFALL2 nukage
+floor SFALL3 nukage
+floor SFALL4 nukage
+floor LPNUKEF nukage//LTP
+
+//SLIME
+floor SLIME01 Slime
+floor SLIME02 Slime
+floor SLIME03 Slime
+floor SLIME04 Slime
+floor SLIME05 Slime
+floor SLIME06 Slime
+floor SLIME07 Slime
+floor SLIME08 Slime
+floor LPSLIME Slime//LTP
+
+//SLIMEFALL
+floor LPSLIMEF Slime//LTP
+
+//LAVA
+floor LAVA1 Lava
+floor LAVA2 Lava
+floor LAVA3 Lava
+floor LAVA4 Lava
+floor LPLAVA Lava//LTP
+
+//LAVAFALL
+floor LPLAVAF Lava//LTP
