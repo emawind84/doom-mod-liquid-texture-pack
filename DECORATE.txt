@@ -281,7 +281,7 @@ Actor LTPLavaBase : LTPCoreSplashBase
 {
 
 	Alpha 1.0
-	renderstyle AddShaded // treats black on the texture as transparent and white as full opacity
+	renderstyle Shaded // treats black on the texture as transparent and white as full opacity
 	stencilcolor "fd7900"//HEX color found in gimp color selector in ther HTML notation box.
 	States
 	{
@@ -591,7 +591,7 @@ Actor LTPToxicChunkMed : LTPToxicChunk
 Actor LTPToxicBase : LTPCoreSplashBase
 {
 	Alpha 1.0
-	renderstyle AddShaded // treats black on the texture as transparent and white as full opacity
+	renderstyle Shaded // treats black on the texture as transparent and white as full opacity
 	stencilcolor "4dde01"//HEX color found in gimp color selector in ther HTML notation box.
 	States
 	{

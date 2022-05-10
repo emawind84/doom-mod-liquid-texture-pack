@@ -13,8 +13,18 @@ vec2 GetLayerposAt(mat3 tbn);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////material setup////////////////////////////////////////////////
-void SetupMaterial(inout Material material)				
+Material ProcessMaterial()
 {
+	Material material;
+	
+	material.Base = vec4(0.0);
+	material.Bright = vec4(0.0);
+	//material.Glow = vec4(0.0);
+	material.Normal = vec3(0.0);
+	material.Specular = vec3(0.0);
+	material.Glossiness = 0.0;
+	material.SpecularLevel = 0.0;
+
     mat3 tbn = GetTBN(); 
 	
 	////Masktexture////
@@ -30,7 +40,7 @@ void SetupMaterial(inout Material material)
 	vec4 DiffuseynegL = texture(Diffuse, (-normalmapbase.xy + GetLiquidscrollnegAt(tbn))) * 0.6;//diffuse texture scroll negetive and brightness 
 	vec4 DiffuseyposXL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollposAt(tbn)) * 0.25) * 0.6;//diffuse texture scroll positive and brightness 
 	vec4 DiffuseynegXL = texture(Diffuse, (-normalmapbase.xy + GetLiquidscrollnegAt(tbn)) * 0.25) * 0.6;//diffuse texture scroll negetive and brightness 
-	vec4 Diffuse = clamp(DiffuseyposL + DiffuseynegL + DiffuseyposXL + DiffuseynegXL,0.0,1.0);//add diffuse textures togeter for generated effect
+	vec4 DiffuseVec4 = clamp(DiffuseyposL + DiffuseynegL + DiffuseyposXL + DiffuseynegXL,0.0,1.0);//add diffuse textures togeter for generated effect
 	
 	////speculartexture////
 	vec4 spectexture = texture(speculartexture, GetTopdiffusescaleAt(tbn));
@@ -39,7 +49,7 @@ void SetupMaterial(inout Material material)
 	vec4 Diffusetoplayer = spectexture;//top diffuse texture and scale value
 	vec4 layerglow = vec4(0.35, 0.0, 0.0, 1.0);//RGBA
 	vec4 Glowblend = clamp(layerglow * (clamp(Diffusemask * 40.0,0.0,1.0)) - (Diffusemask * 0.55),0.0,1.0);
-	vec4 Diffusemasked = clamp(Diffuse - (clamp(Diffusemask * 40.0,0.0,1.0)),0.0,1.0);
+	vec4 Diffusemasked = clamp(DiffuseVec4 - (clamp(Diffusemask * 40.0,0.0,1.0)),0.0,1.0);
 	vec4 diffuselayermasked = Diffusetoplayer * (clamp(Diffusemask * 10.0,0.0,1.0));
 	vec4 Diffusefinal = clamp(diffuselayermasked + Diffusemasked + Glowblend,0.0,1.0);
 	
@@ -58,6 +68,7 @@ void SetupMaterial(inout Material material)
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
 #endif
+	return material;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

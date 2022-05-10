@@ -1,0 +1,1 @@
+"C:\Program Files\7-Zip\7z.exe" a -tzip -mx=0 "../LTP V6.5.pk3" * -r -x!makepk3.bat -xr!.git -x!*.pk3

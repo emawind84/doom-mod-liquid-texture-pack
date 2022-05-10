@@ -9,8 +9,18 @@ vec2 GetLiquidscrollnegAt(mat3 tbn);
 vec2 GetLayerposAt(mat3 tbn);
 
 
-void SetupMaterial(inout Material material)				
+Material ProcessMaterial()
 {
+	Material material;
+	
+	material.Base = vec4(0.0);
+	material.Bright = vec4(0.0);
+	//material.Glow = vec4(0.0);
+	material.Normal = vec3(0.0);
+	material.Specular = vec3(0.0);
+	material.Glossiness = 0.0;
+	material.SpecularLevel = 0.0;
+
     mat3 tbn = GetTBN(); 
     vec2 texCoord = ParallaxMap(tbn);//parallax texture coord
 	
@@ -43,7 +53,7 @@ void SetupMaterial(inout Material material)
 	
 	////generate reflection
 	vec4 Enviro = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + Nmap * 0.45);//reflection texture interat with generated normal texture
-	vec4 reflection = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
+	vec4 reflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
 	vec4 DIffuseypos = texture(Diffuse, GetLiquidscrollposAt(tbn) * 0.175);//diffuse texture scroll Y positive	and devide brightness in half
@@ -51,7 +61,7 @@ void SetupMaterial(inout Material material)
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
 	////refact diffuse color
 	vec4 refaction = texture(Diffuse, ((-Nmap * 1.5) + (GetLiquidscrollnegAt(tbn) * 0.2))) * 0.50 * refacttint;
-	vec4 DIffuse = clamp(DIffuselarge + refaction + reflection,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
+	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + reflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
 	////generate liquidfall foam
 	vec4 foam1 = texture(foamlayer, GetTopscrollposAt(tbn));//foam layer scroll speed
@@ -59,7 +69,7 @@ void SetupMaterial(inout Material material)
 	vec4 foam = (foam1 + foam2) * foamcolor;//foam color values must stay under 0.5 for a total texture brightness of 1.0 or under.
 	
 	//diffuse final color
-	vec4 DIffusefinal = clamp(DIffuse + foam,0.0,1.0);
+	vec4 DIffusefinal = clamp(DiffuseVec4 + foam,0.0,1.0);
 	
 	material.Base = DIffusefinal;
     material.Normal = GetBumpedNormal(tbn, texCoord);
@@ -68,7 +78,8 @@ void SetupMaterial(inout Material material)
     material.Specular = texture(speculartexture, texCoord).rgb;
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
-#endif 
+#endif
+	return material;
 }
 
 

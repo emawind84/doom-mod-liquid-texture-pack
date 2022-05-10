@@ -12,8 +12,18 @@ vec2 GetLayerposAt(mat3 tbn);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////material setup////////////////////////////////////////////////
-void SetupMaterial(inout Material material)				
+Material ProcessMaterial()
 {
+	Material material;
+	
+	material.Base = vec4(0.0);
+	material.Bright = vec4(0.0);
+	//material.Glow = vec4(0.0);
+	material.Normal = vec3(0.0);
+	material.Specular = vec3(0.0);
+	material.Glossiness = 0.0;
+	material.SpecularLevel = 0.0;
+
     mat3 tbn = GetTBN(); 
 	
 	////Masktexture////
@@ -62,6 +72,7 @@ void SetupMaterial(inout Material material)
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
 #endif
+	return material;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

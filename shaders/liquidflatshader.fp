@@ -7,8 +7,18 @@ vec2 GetLiquidAnimationYnegAt(mat3 tbn);
 vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord);
 
 
-void SetupMaterial(inout Material material)				
+Material ProcessMaterial()
 {
+	Material material;
+	
+	material.Base = vec4(0.0);
+	material.Bright = vec4(0.0);
+	//material.Glow = vec4(0.0);
+	material.Normal = vec3(0.0);
+	material.Specular = vec3(0.0);
+	material.Glossiness = 0.0;
+	material.SpecularLevel = 0.0;
+
     mat3 tbn = GetTBN(); 
     vec2 texCoord = ParallaxMap(tbn);//parallax texture coord
 
@@ -39,7 +49,7 @@ void SetupMaterial(inout Material material)
 	
 	////generate reflection
 	vec4 Enviro = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + (Nmap * 0.30));//reflection texture interat with generated normal texture
-	vec4 reflection = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
+	vec4 ReflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
 	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(tbn)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
@@ -49,9 +59,9 @@ void SetupMaterial(inout Material material)
 	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(tbn)));
 	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(tbn)));
 	vec4 refaction = (refractypos + refractyneg) * 0.25 * refacttint;
-	vec4 DIffuse = clamp(DIffuselarge + refaction + reflection,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
+	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + ReflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
-	material.Base = DIffuse; //generated reflection and diffuse texture	combine together for final result
+	material.Base = DiffuseVec4; //generated reflection and diffuse texture	combine together for final result
     material.Normal = GetBumpedNormal(tbn, GetbottomdiffusescaleAt(tbn));
 	material.Bright = texture(brighttexture, texCoord); 
 #if defined(SPECULAR)
@@ -59,6 +69,7 @@ void SetupMaterial(inout Material material)
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
 #endif
+	return material;
 }
 
 
