@@ -1,9 +1,9 @@
 mat3 GetTBN();
 vec2 GetAutoscaleAt(vec2 texcoord);
 vec2 ParallaxMap(mat3 tbn); 
-vec2 GetbottomdiffusescaleAt(mat3 tbn);
-vec2 GetLiquidAnimationYposAt(mat3 tbn);
-vec2 GetLiquidAnimationYnegAt(mat3 tbn);
+vec2 GetbottomdiffusescaleAt(vec2 parallaxMap);
+vec2 GetLiquidAnimationYposAt(vec2 parallaxMap);
+vec2 GetLiquidAnimationYnegAt(vec2 parallaxMap);
 vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord);
 
 
@@ -23,8 +23,8 @@ Material ProcessMaterial()
     vec2 texCoord = ParallaxMap(tbn);//parallax texture coord
 
 	//// generate normal texture
-	vec4 NMone = texture(normaltexture, GetLiquidAnimationYposAt(tbn));//normalmap scroll Y positive + devide textures brightness in half
-	vec4 NM2two = texture(normaltexture, GetLiquidAnimationYnegAt(tbn));//normalmap scroll y negetive + devide textures brightness in half
+	vec4 NMone = texture(normaltexture, GetLiquidAnimationYposAt(texCoord));//normalmap scroll Y positive + devide textures brightness in half
+	vec4 NM2two = texture(normaltexture, GetLiquidAnimationYnegAt(texCoord));//normalmap scroll y negetive + devide textures brightness in half
 	vec2 Nmap = ((NMone + NM2two) * 0.5).xy;//add together as one texture at full brightness.
 	vec2 Nmap2 = -Nmap * 0.5;
 	
@@ -52,17 +52,17 @@ Material ProcessMaterial()
 	vec4 ReflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
-	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(tbn)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
-	vec4 DIffuseyneg = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYnegAt(tbn)) * 0.4);//diffuse texture scroll y negetive and devide brightness in half
+	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(texCoord)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
+	vec4 DIffuseyneg = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYnegAt(texCoord)) * 0.4);//diffuse texture scroll y negetive and devide brightness in half
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
 	////refact diffuse color
-	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(tbn)));
-	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(tbn)));
+	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(texCoord)));
+	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(texCoord)));
 	vec4 refaction = (refractypos + refractyneg) * 0.25 * refacttint;
 	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + ReflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
 	material.Base = DiffuseVec4; //generated reflection and diffuse texture	combine together for final result
-    material.Normal = GetBumpedNormal(tbn, GetbottomdiffusescaleAt(tbn));
+    material.Normal = GetBumpedNormal(tbn, texCoord);
 	material.Bright = texture(brighttexture, texCoord); 
 #if defined(SPECULAR)
     material.Specular = texture(speculartexture, texCoord).rgb;
@@ -99,9 +99,9 @@ mat3 GetTBN()
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////animate liquid movement///////////////////////////
 
-vec2 GetLiquidAnimationYposAt(mat3 tbn)
+vec2 GetLiquidAnimationYposAt(vec2 parallaxMap)
 {
-	vec2 texCoord = GetbottomdiffusescaleAt(tbn);
+	vec2 texCoord = GetbottomdiffusescaleAt(parallaxMap);
 	const float pi = 3.14159265358979323846;									
 	vec2 offset = vec2(0,0);
 	offset.y = texCoord.y * 1.5 + (timer * 0.11);//offset texture by 50% + scroll direction and speed to correct unwanted visual texture overlapping animation glitch
@@ -109,9 +109,9 @@ vec2 GetLiquidAnimationYposAt(mat3 tbn)
     return(texCoord += offset);
 }
 
-vec2 GetLiquidAnimationYnegAt(mat3 tbn)
+vec2 GetLiquidAnimationYnegAt(vec2 parallaxMap)
 {
-	vec2 texCoord = GetbottomdiffusescaleAt(tbn);
+	vec2 texCoord = GetbottomdiffusescaleAt(parallaxMap);
 	const float pi = 3.14159265358979323846;									
 	vec2 offset = vec2(0,0);
 	offset.y =  texCoord.y + (timer * -0.11);//scroll direction and speed  
@@ -124,8 +124,8 @@ vec2 GetLiquidAnimationYnegAt(mat3 tbn)
 vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord)
 {
 #if defined(NORMALMAP)
-	vec3 normalmapA = texture(normaltexture, GetLiquidAnimationYposAt(tbn)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
-	vec3 normalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(tbn)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
+	vec3 normalmapA = texture(normaltexture, GetLiquidAnimationYposAt(texcoord)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
+	vec3 normalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(texcoord)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
 	vec3 normalmap = (normalmapA + normalmapB) * 0.5;//combine as one full texture brightness
     normalmap = normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
     normalmap.xy *= vec2(0.5, -0.5); //flip Y
@@ -137,9 +137,9 @@ vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord)
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////bottom diffuse texture scale/////////////////////////////////////
-vec2 GetbottomdiffusescaleAt(mat3 tbn)
+vec2 GetbottomdiffusescaleAt(vec2 parallaxMap)
 {																			
-    return ParallaxMap(tbn) * 1.2;//change scale of bottom diffuse texture here
+    return parallaxMap * 1.2;//change scale of bottom diffuse texture here
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ vec2 ParallaxMap(mat3 tbn)
     vec2 PXcoord = GetAutoscaleAt(texCoord).xy;
 	vec2 parallaxScale = vec2(5.0);
 	float minLayers = 4.0;
-    float maxLayers = 16.0;
+    float maxLayers = 8.0;
 	float viewscale = 0.0;
 	float viewscaleX = float (texSize.x / texSize.y);
 	float viewscaleY = float (texSize.y / texSize.x);                 
@@ -196,24 +196,10 @@ vec2 ParallaxMap(mat3 tbn)
     float currentLayerDepth = 0.0;
 	
 	// parallax auto scale for non 1:1 (x,y) textures
-	if (texSize.x > texSize.y)
-	{
-	parallaxScale = parallaxScale / float (texSize.y);
-	}
-	else //(texSize.x < texSize.y)
-	{
-	parallaxScale = parallaxScale / float (texSize.x);
-	}	
+	parallaxScale = parallaxScale / float (max(texSize.y, texSize.x));
 	
 	// correct the visual parallax effect for non 1:1 (x,y) ratio textures 
-	if (texSize.x > texSize.y)
-	{
-	V.y = V.y / viewscaleX;
-	}
-	else
-	{
-	V.x = V.x / viewscaleY;
-	}
+	V.y = V.y / max(viewscaleX, viewscaleY);
 			 
 	// the amount to shift the texture coordinates per layer (from vector P)
     vec2 P = V.xy * parallaxScale;
@@ -238,7 +224,7 @@ vec2 ParallaxMap(mat3 tbn)
 	currentTexCoords += deltaTexCoords;
 	currentLayerDepth -= layerDepth;
 
-	const int _reliefSteps = 8;
+	const int _reliefSteps = 4;
 	int currentStep = _reliefSteps;
 	while (currentStep > 0) {
 	float currentGetDisplacementAt = GetDisplacementAt(currentTexCoords);
