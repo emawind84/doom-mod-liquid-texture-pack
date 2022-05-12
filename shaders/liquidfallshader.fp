@@ -1,7 +1,7 @@
 mat3 GetTBN();
 vec2 GetAutoscaleAt(vec2 texcoord);
 vec2 ParallaxMap(mat3 tbn); 
-vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord);
+vec3 GetBumpedNormal(mat3 tbn, vec2 ParallaxMap);
 vec2 GetTopscrollposAt(vec2 parallaxMap);
 vec2 GetLayerScaleAt(vec2 parallaxMap);
 vec2 GetLiquidscrollposAt(vec2 parallaxMap);
@@ -20,13 +20,13 @@ Material ProcessMaterial()
 	material.Specular = vec3(0.0);
 	material.Glossiness = 0.0;
 	material.SpecularLevel = 0.0;
-
+	
     mat3 tbn = GetTBN(); 
-    vec2 texCoord = ParallaxMap(tbn);//parallax texture coord
+    vec2 ParallaxMap = ParallaxMap(tbn);
 	
 	//// generate normal texture
-	vec4 NMone = texture(normaltexture, GetLiquidscrollposAt(texCoord));//normalmap scroll Y positive
-	vec4 NM2two = texture(normaltexture, GetLiquidscrollnegAt(texCoord));//normalmap scroll y negetive
+	vec4 NMone = texture(normaltexture, GetLiquidscrollposAt(ParallaxMap));//normalmap scroll Y positive
+	vec4 NM2two = texture(normaltexture, GetLiquidscrollnegAt(ParallaxMap));//normalmap scroll y negetive
 	vec2 Nmap = ((NMone + NM2two) * 0.5).xy;// devide textures brightness in half and add together as one texture at full brightness.
 	
 	////color tint values///////////
@@ -51,34 +51,34 @@ Material ProcessMaterial()
 		#endif
 	#endif
 	
-	////generate reflection
+	///generate reflection
 	vec4 Enviro = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + Nmap * 0.45);//reflection texture interat with generated normal texture
 	vec4 reflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
-	vec4 DIffuseypos = texture(Diffuse, GetLiquidscrollposAt(texCoord) * 0.175);//diffuse texture scroll Y positive	and devide brightness in half
-	vec4 DIffuseyneg = texture(Diffuse, GetLiquidscrollposAt(texCoord) * 0.3);//diffuse texture scroll y negetive and devide brightness in half
+	vec4 DIffuseypos = texture(Diffuse, GetLiquidscrollposAt(ParallaxMap) * 0.175);//diffuse texture scroll Y positive	and devide brightness in half
+	vec4 DIffuseyneg = texture(Diffuse, GetLiquidscrollposAt(ParallaxMap) * 0.3);//diffuse texture scroll y negetive and devide brightness in half
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
 	////refact diffuse color
-	vec4 refaction = texture(Diffuse, ((-Nmap * 1.5) + (GetLiquidscrollnegAt(texCoord) * 0.2))) * 0.50 * refacttint;
+	vec4 refaction = texture(Diffuse, ((Nmap * (-1.5)) + (GetLiquidscrollnegAt(ParallaxMap) * 0.2))) * 0.50 * refacttint;
 	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + reflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
 	////generate liquidfall foam
-	vec4 foam1 = texture(foamlayer, GetTopscrollposAt(texCoord));//foam layer scroll speed
-	vec4 foam2 = texture(foamlayer, GetTopscrollposAt(texCoord) * 2.5);//foam layer scroll speed 
+	vec4 foam1 = texture(foamlayer, GetTopscrollposAt(ParallaxMap));//foam layer scroll speed
+	vec4 foam2 = texture(foamlayer, GetTopscrollposAt(ParallaxMap) * 2.5);//foam layer scroll speed 
 	vec4 foam = (foam1 + foam2) * foamcolor;//foam color values must stay under 0.5 for a total texture brightness of 1.0 or under.
 	
 	//diffuse final color
 	vec4 DIffusefinal = clamp(DiffuseVec4 + foam,0.0,1.0);
 	
 	material.Base = DIffusefinal;
-    material.Normal = GetBumpedNormal(tbn, texCoord);
-	material.Bright = texture(brighttexture, texCoord); 
+    material.Normal = GetBumpedNormal(tbn, ParallaxMap);
+	material.Bright = texture(brighttexture, ParallaxMap); 
 #if defined(SPECULAR)
-    material.Specular = texture(speculartexture, texCoord).rgb;
+    material.Specular = texture(speculartexture, ParallaxMap).rgb;
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
-#endif
+#endif 
 	return material;
 }
 
@@ -152,11 +152,11 @@ vec2 GetTopscrollposAt(vec2 parallaxMap)//scroll direction for foam texture
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////Normal texture Generate and normal math ///////////////////
-vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord)
+vec3 GetBumpedNormal(mat3 tbn, vec2 ParallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 normalmapA = texture(normaltexture, GetLiquidscrollposAt(texcoord)).xyz;//normalmap for diffuse top layer texture
-	vec3 normalmapB = texture(normaltexture, GetLiquidscrollnegAt(texcoord)).xyz;//normalmap for diffuse top layer texture
+	vec3 normalmapA = texture(normaltexture, GetLiquidscrollposAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
+	vec3 normalmapB = texture(normaltexture, GetLiquidscrollnegAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
 	vec3 normalmap = (normalmapA + normalmapB) * 0.5;
     normalmap = normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
     normalmap.xy *= vec2(1, -1); //flip Y
@@ -216,13 +216,13 @@ vec2 ParallaxMap(mat3 tbn)
     vec3 V = normalize(invTBN * (uCameraPos.xyz - pixelpos.xyz));
 	vec2 texCoord = vTexCoord.st;
     vec2 PXcoord = GetAutoscaleAt(texCoord).xy;
-	vec2 parallaxScale = vec2(14.0);
-	float minLayers = 4.0;
-    float maxLayers = 8.0;
+	vec2 parallaxScale = vec2(15.0);
+	float minLayers = 0.0;
+    float maxLayers = 1.0;
 	float viewscale = 0.0;
 	float viewscaleX = float (texSize.x / texSize.y);
 	float viewscaleY = float (texSize.y / texSize.x);                 
-    float numLayers = mix(maxLayers, minLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
+    float numLayers = mix(minLayers, maxLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
 
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
@@ -258,7 +258,7 @@ vec2 ParallaxMap(mat3 tbn)
 	currentTexCoords += deltaTexCoords;
 	currentLayerDepth -= layerDepth;
 
-	const int _reliefSteps = 4;
+	const int _reliefSteps = 8;
 	int currentStep = _reliefSteps;
 	while (currentStep > 0) {
 	float currentGetDisplacementAt = GetDisplacementAt(currentTexCoords);

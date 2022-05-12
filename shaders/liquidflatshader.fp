@@ -4,7 +4,7 @@ vec2 ParallaxMap(mat3 tbn);
 vec2 GetbottomdiffusescaleAt(vec2 parallaxMap);
 vec2 GetLiquidAnimationYposAt(vec2 parallaxMap);
 vec2 GetLiquidAnimationYnegAt(vec2 parallaxMap);
-vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord);
+vec3 GetBumpedNormal(mat3 tbn, vec2 parallaxMap);
 
 
 Material ProcessMaterial()
@@ -18,13 +18,13 @@ Material ProcessMaterial()
 	material.Specular = vec3(0.0);
 	material.Glossiness = 0.0;
 	material.SpecularLevel = 0.0;
-
+	
     mat3 tbn = GetTBN(); 
-    vec2 texCoord = ParallaxMap(tbn);//parallax texture coord
+    vec2 ParallaxMap = ParallaxMap(tbn);//parallax texture coord
 
 	//// generate normal texture
-	vec4 NMone = texture(normaltexture, GetLiquidAnimationYposAt(texCoord));//normalmap scroll Y positive + devide textures brightness in half
-	vec4 NM2two = texture(normaltexture, GetLiquidAnimationYnegAt(texCoord));//normalmap scroll y negetive + devide textures brightness in half
+	vec4 NMone = texture(normaltexture, GetLiquidAnimationYposAt(ParallaxMap));//normalmap scroll Y positive + devide textures brightness in half
+	vec4 NM2two = texture(normaltexture, GetLiquidAnimationYnegAt(ParallaxMap));//normalmap scroll y negetive + devide textures brightness in half
 	vec2 Nmap = ((NMone + NM2two) * 0.5).xy;//add together as one texture at full brightness.
 	vec2 Nmap2 = -Nmap * 0.5;
 	
@@ -52,20 +52,20 @@ Material ProcessMaterial()
 	vec4 ReflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
-	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(texCoord)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
-	vec4 DIffuseyneg = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYnegAt(texCoord)) * 0.4);//diffuse texture scroll y negetive and devide brightness in half
+	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(ParallaxMap)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
+	vec4 DIffuseyneg = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYnegAt(ParallaxMap)) * 0.4);//diffuse texture scroll y negetive and devide brightness in half
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
 	////refact diffuse color
-	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(texCoord)));
-	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(texCoord)));
+	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(ParallaxMap)));
+	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(ParallaxMap)));
 	vec4 refaction = (refractypos + refractyneg) * 0.25 * refacttint;
-	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + ReflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
+	vec4 DIffuse = clamp(DIffuselarge + refaction + ReflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
-	material.Base = DiffuseVec4; //generated reflection and diffuse texture	combine together for final result
-    material.Normal = GetBumpedNormal(tbn, texCoord);
-	material.Bright = texture(brighttexture, texCoord); 
+	material.Base = DIffuse; //generated reflection and diffuse texture	combine together for final result
+    material.Normal = GetBumpedNormal(tbn, GetbottomdiffusescaleAt(ParallaxMap));
+	material.Bright = texture(brighttexture, ParallaxMap); 
 #if defined(SPECULAR)
-    material.Specular = texture(speculartexture, texCoord).rgb;
+    material.Specular = texture(speculartexture, ParallaxMap).rgb;
     material.Glossiness = uSpecularMaterial.x;
     material.SpecularLevel = uSpecularMaterial.y;
 #endif
@@ -121,11 +121,11 @@ vec2 GetLiquidAnimationYnegAt(vec2 parallaxMap)
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////Normal texture Generate and normal math ///////////////////
 
-vec3 GetBumpedNormal(mat3 tbn, vec2 texcoord)
+vec3 GetBumpedNormal(mat3 tbn, vec2 parallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 normalmapA = texture(normaltexture, GetLiquidAnimationYposAt(texcoord)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
-	vec3 normalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(texcoord)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
+	vec3 normalmapA = texture(normaltexture, GetLiquidAnimationYposAt(parallaxMap)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
+	vec3 normalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(parallaxMap)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
 	vec3 normalmap = (normalmapA + normalmapB) * 0.5;//combine as one full texture brightness
     normalmap = normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
     normalmap.xy *= vec2(0.5, -0.5); //flip Y
@@ -183,12 +183,12 @@ vec2 ParallaxMap(mat3 tbn)
 	vec2 texCoord = vTexCoord.st;
     vec2 PXcoord = GetAutoscaleAt(texCoord).xy;
 	vec2 parallaxScale = vec2(5.0);
-	float minLayers = 4.0;
-    float maxLayers = 8.0;
+	float minLayers = 0.0;
+    float maxLayers = 1.0;
 	float viewscale = 0.0;
 	float viewscaleX = float (texSize.x / texSize.y);
 	float viewscaleY = float (texSize.y / texSize.x);                 
-    float numLayers = mix(maxLayers, minLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
+    float numLayers = mix(minLayers, maxLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
 
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
@@ -224,7 +224,7 @@ vec2 ParallaxMap(mat3 tbn)
 	currentTexCoords += deltaTexCoords;
 	currentLayerDepth -= layerDepth;
 
-	const int _reliefSteps = 4;
+	const int _reliefSteps = 8;
 	int currentStep = _reliefSteps;
 	while (currentStep > 0) {
 	float currentGetDisplacementAt = GetDisplacementAt(currentTexCoords);

@@ -21,30 +21,29 @@ Material ProcessMaterial()
 	material.Specular = vec3(0.0);
 	material.Glossiness = 0.0;
 	material.SpecularLevel = 0.0;
-
-    mat3 tbn = GetTBN();
-	vec2 parallaxMap = ParallaxMap(tbn);
+    mat3 tbn = GetTBN(); 
+	vec2 ParallaxMap = ParallaxMap(tbn);
 	
 	////Masktexture////
-	vec4 Diffusemask = texture(Diffusemask, GetLayerposAt(parallaxMap));//parallax texture (black / white)
+	vec4 Diffusemask = texture(Diffusemask,GetLayerposAt(ParallaxMap));//parallax texture (black / white)
 	
 	////Normaltexture For bottom layer////
-	vec4 normalmapbase = texture(Diffusedistortion, GetNormalLiquidscrollnegAt(parallaxMap) * 0.35) * 0.2;
+	vec4 normalmapbase = texture(Diffusedistortion, GetNormalLiquidscrollnegAt(ParallaxMap) * 0.35) * 0.2;
 	
 	////generate diffuse base texture////
-	vec4 DiffuseyposM = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(parallaxMap)))* 0.75;//diffuse texture scroll positive and brightness 
-	vec4 DiffuseynegL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(parallaxMap)* 0.5))* 0.75;//diffuse texture scroll negetive and brightness 
-	vec4 DiffuseyposXL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(parallaxMap) * 0.25))* 0.75;//diffuse texture scroll positive and brightness 
-	vec4 DiffuseVec4 = clamp(DiffuseyposM + DiffuseynegL + DiffuseyposXL,0.0,1.0);//add diffuse textures togeter for generated effect
+	vec4 DiffuseyposM = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)))* 0.75;//diffuse texture scroll positive and brightness 
+	vec4 DiffuseynegL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)* 0.5))* 0.75;//diffuse texture scroll negetive and brightness 
+	vec4 DiffuseyposXL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap) * 0.25))* 0.75;//diffuse texture scroll positive and brightness 
+	vec4 Diffuse = clamp(DiffuseyposM + DiffuseynegL + DiffuseyposXL,0.0,1.0);//add diffuse textures togeter for generated effect
 	
 	////speculartexture////
-	vec4 spectexture = texture(speculartexture, GetTopdiffusescaleAt(parallaxMap));
+	vec4 spectexture = texture(speculartexture, GetTopdiffusescaleAt(ParallaxMap));
 	
 	////generate diffuse top layer////
 	vec4 Diffusetoplayer = spectexture;//top diffuse texture and scale value
 	vec4 layerglow = vec4(0.35, 0.0, 0.0, 1.0);//RGBA
 	vec4 Glowblend = clamp(layerglow * (clamp(Diffusemask * 40.0,0.0,1.0)) - (Diffusemask * 0.35),0.0,1.0);
-	vec4 Diffusemasked = clamp(DiffuseVec4 - (clamp(Diffusemask * 40.0,0.0,1.0)),0.0,1.0);
+	vec4 Diffusemasked = clamp(Diffuse - (clamp(Diffusemask * 40.0,0.0,1.0)),0.0,1.0);
 	vec4 diffuselayermasked = Diffusetoplayer * (clamp(Diffusemask * 10.0,0.0,1.0));
 	vec4 Diffusefinal = clamp(diffuselayermasked + Diffusemasked + Glowblend,0.0,1.0);
 	
@@ -56,7 +55,7 @@ Material ProcessMaterial()
 
 	////materials////
 	material.Base = Diffusefinal;
-    material.Normal = GetBumpedNormal(tbn, parallaxMap);
+    material.Normal = GetBumpedNormal(tbn, ParallaxMap);
 	material.Bright = brightmapmask; 
 #if defined(SPECULAR)
     material.Specular = Specfinal.rgb;
@@ -154,7 +153,7 @@ vec2 GetLayerposAt(vec2 parallaxMap)
 ///////////////top layer diffuse texture scale//////////////////////////////////
 vec2 GetTopdiffusescaleAt(vec2 parallaxMap)
 {																		
-    vec2 texcoord = parallaxMap;
+    vec2 texcoord = GetLayerposAt(parallaxMap);
 	texcoord.x = texcoord.x * 7.0;
 	texcoord.y = texcoord.y * 10.0;
     return texcoord;
@@ -204,12 +203,12 @@ vec2 ParallaxMap(mat3 tbn)
 	vec2 texCoord = vTexCoord.st;
     vec2 PXcoord = GetAutoscaleAt(texCoord).xy;
 	vec2 parallaxScale = vec2(10.0);
-	float minLayers = 4.0;
-    float maxLayers = 8.0;
+	float minLayers = 0.0;
+    float maxLayers = 1.0;
 	float viewscale = 0.0;
 	float viewscaleX = float (texSize.x / texSize.y);
 	float viewscaleY = float (texSize.y / texSize.x);                 
-    float numLayers = mix(maxLayers, minLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
+    float numLayers = mix(minLayers, maxLayers, clamp(abs(V.z), 0.0, 1.0)); // clamp is required due to precision loss
 
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
@@ -245,7 +244,7 @@ vec2 ParallaxMap(mat3 tbn)
 	currentTexCoords += deltaTexCoords;
 	currentLayerDepth -= layerDepth;
 
-	const int _reliefSteps = 4;
+	const int _reliefSteps = 8;
 	int currentStep = _reliefSteps;
 	while (currentStep > 0) {
 	float currentGetDisplacementAt = GetDisplacementAt(currentTexCoords);
