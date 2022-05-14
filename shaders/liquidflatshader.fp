@@ -48,20 +48,21 @@ Material ProcessMaterial()
 	#endif
 	
 	////generate reflection
-	vec4 Enviro = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + (Nmap * 0.30));//reflection texture interat with generated normal texture
-	vec4 ReflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
+	vec4 Reflectionbase = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + (Nmap * 0.30));//reflection texture interat with generated normal texture
+	vec4 Reflectionfinal = clamp(Reflectionbase * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
 	vec4 DIffuseypos = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYposAt(ParallaxMap)) * 0.4);//diffuse texture scroll Y positive	and devide brightness in half
 	vec4 DIffuseyneg = texture(Diffuse, ( Nmap2 + GetLiquidAnimationYnegAt(ParallaxMap)) * 0.4);//diffuse texture scroll y negetive and devide brightness in half
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
-	////refact diffuse color
-	vec4 refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(ParallaxMap)));
-	vec4 refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(ParallaxMap)));
-	vec4 refaction = (refractypos + refractyneg) * 0.25 * refacttint;
-	vec4 DIffuse = clamp(DIffuselarge + refaction + ReflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
-	material.Base = DIffuse; //generated reflection and diffuse texture	combine together for final result
+	////refact diffuse color
+	vec4 Refractypos = texture(Diffuse, (-Nmap + GetLiquidAnimationYposAt(ParallaxMap)));
+	vec4 Refractyneg = texture(Diffuse, (-Nmap + GetLiquidAnimationYnegAt(ParallaxMap)));
+	vec4 Refaction = (Refractypos + Refractyneg) * 0.25 * refacttint;
+	vec4 DIffusefinal = clamp(DIffuselarge + Refaction + Reflectionfinal,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
+	
+	material.Base = DIffusefinal; //generated reflection and diffuse texture	combine together for final result
     material.Normal = GetBumpedNormal(tbn, GetbottomdiffusescaleAt(ParallaxMap));
 	material.Bright = texture(brighttexture, ParallaxMap); 
 #if defined(SPECULAR)
@@ -124,12 +125,12 @@ vec2 GetLiquidAnimationYnegAt(vec2 parallaxMap)
 vec3 GetBumpedNormal(mat3 tbn, vec2 parallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 normalmapA = texture(normaltexture, GetLiquidAnimationYposAt(parallaxMap)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
-	vec3 normalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(parallaxMap)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
-	vec3 normalmap = (normalmapA + normalmapB) * 0.5;//combine as one full texture brightness
-    normalmap = normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
-    normalmap.xy *= vec2(0.5, -0.5); //flip Y
-    return normalize(tbn * normalmap);
+	vec3 NormalmapA = texture(normaltexture, GetLiquidAnimationYposAt(parallaxMap)).xyz;//normalmap Y+ offset texture scroll + devide textures brightness in half
+	vec3 NormalmapB = texture(normaltexture, GetLiquidAnimationYnegAt(parallaxMap)).xyz;//normalmap Y- offset texture scroll + devide textures brightness in half
+	vec3 Normalmap = (NormalmapA + NormalmapB) * 0.5;//combine as one full texture brightness
+		 Normalmap = Normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
+		 Normalmap.xy *= vec2(0.5, -0.5); //flip Y
+    return normalize(tbn * Normalmap);
 #else
     return normalize(vWorldNormal.xyz);
 #endif

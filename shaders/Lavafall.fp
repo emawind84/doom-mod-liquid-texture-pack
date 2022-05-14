@@ -16,47 +16,48 @@ Material ProcessMaterial()
 	
 	material.Base = vec4(0.0);
 	material.Bright = vec4(0.0);
-	//material.Glow = vec4(0.0);
+	//material.Glow = vec4(0.0); 
 	material.Normal = vec3(0.0);
 	material.Specular = vec3(0.0);
 	material.Glossiness = 0.0;
 	material.SpecularLevel = 0.0;
+	
     mat3 tbn = GetTBN(); 
 	vec2 ParallaxMap = ParallaxMap(tbn);
 	
 	////Masktexture////
-	vec4 Diffusemask = texture(Diffusemask,GetLayerposAt(ParallaxMap));//parallax texture (black / white)
+	vec4 Diffusemasktex = texture(Diffusemask, GetLayerposAt(ParallaxMap));//parallax texture (black / white)
 	
 	////Normaltexture For bottom layer////
-	vec4 normalmapbase = texture(Diffusedistortion, GetNormalLiquidscrollnegAt(ParallaxMap) * 0.35) * 0.2;
+	vec4 Normalmapbase = texture(Diffusedistortion, GetNormalLiquidscrollnegAt(ParallaxMap) * 0.35) * 0.2;
 	
 	////generate diffuse base texture////
-	vec4 DiffuseyposM = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)))* 0.75;//diffuse texture scroll positive and brightness 
-	vec4 DiffuseynegL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)* 0.5))* 0.75;//diffuse texture scroll negetive and brightness 
-	vec4 DiffuseyposXL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap) * 0.25))* 0.75;//diffuse texture scroll positive and brightness 
-	vec4 Diffuse = clamp(DiffuseyposM + DiffuseynegL + DiffuseyposXL,0.0,1.0);//add diffuse textures togeter for generated effect
+	vec4 DiffuseyposM = texture(Diffuse, (Normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)))* 0.75;//diffuse texture scroll positive and brightness 
+	vec4 DiffuseynegL = texture(Diffuse, (Normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)* 0.5))* 0.75;//diffuse texture scroll negetive and brightness 
+	vec4 DiffuseyposXL = texture(Diffuse, (Normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap) * 0.25))* 0.75;//diffuse texture scroll positive and brightness 
+	vec4 Diffusebase = clamp(DiffuseyposM + DiffuseynegL + DiffuseyposXL,0.0,1.0);//add diffuse textures togeter for generated effect
 	
 	////speculartexture////
-	vec4 spectexture = texture(speculartexture, GetTopdiffusescaleAt(ParallaxMap));
+	vec4 Spectexture = texture(speculartexture, GetTopdiffusescaleAt(ParallaxMap));
 	
 	////generate diffuse top layer////
-	vec4 Diffusetoplayer = spectexture;//top diffuse texture and scale value
-	vec4 layerglow = vec4(0.35, 0.0, 0.0, 1.0);//RGBA
-	vec4 Glowblend = clamp(layerglow * (clamp(Diffusemask * 40.0,0.0,1.0)) - (Diffusemask * 0.35),0.0,1.0);
-	vec4 Diffusemasked = clamp(Diffuse - (clamp(Diffusemask * 40.0,0.0,1.0)),0.0,1.0);
-	vec4 diffuselayermasked = Diffusetoplayer * (clamp(Diffusemask * 10.0,0.0,1.0));
-	vec4 Diffusefinal = clamp(diffuselayermasked + Diffusemasked + Glowblend,0.0,1.0);
+	vec4 Diffusetoplayer = Spectexture;//top diffuse texture and scale value
+	vec4 Layerglow = vec4(0.35, 0.0, 0.0, 1.0);//RGBA
+	vec4 Glowblend = clamp(Layerglow * (clamp(Diffusemasktex * 40.0,0.0,1.0)) - (Diffusemasktex * 0.35),0.0,1.0);
+	vec4 Diffusemasked = clamp(Diffusebase - (clamp(Diffusemasktex * 40.0,0.0,1.0)),0.0,1.0);
+	vec4 Diffuselayermasked = Diffusetoplayer * (clamp(Diffusemasktex * 10.0,0.0,1.0));
+	vec4 Diffusefinal = clamp(Diffuselayermasked + Diffusemasked + Glowblend,0.0,1.0);
 	
 	//// generate brightmap texture////
-	vec4 brightmapmask = clamp(Diffusefinal + 0.6 - (clamp(Diffusemask * 10.0,0.0,1.0)) + (clamp(Glowblend * 2.0,0.0,1.0)),0.0,1.0);
+	vec4 Brightmapmask = clamp(Diffusefinal + 0.6 - (clamp(Diffusemasktex * 10.0,0.0,1.0)) + (clamp(Glowblend * 2.0,0.0,1.0)),0.0,1.0);
 	
 	////generate specular texure masked////
-	vec4 Specfinal = spectexture * Diffusemask;//specular texture values multiplied by the diffuse mask texture ( 0.0 = black / 1.0 = white)
+	vec4 Specfinal = Spectexture * Diffusemasktex;//specular texture values multiplied by the diffuse mask texture ( 0.0 = black / 1.0 = white)
 
 	////materials////
 	material.Base = Diffusefinal;
     material.Normal = GetBumpedNormal(tbn, ParallaxMap);
-	material.Bright = brightmapmask; 
+	material.Bright = Brightmapmask; 
 #if defined(SPECULAR)
     material.Specular = Specfinal.rgb;
     material.Glossiness = uSpecularMaterial.x;
@@ -119,14 +120,14 @@ vec2 GetLiquidscrollnegAt(vec2 parallaxMap)//scroll direction for large base tex
 vec3 GetBumpedNormal(mat3 tbn, vec2 parallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 Diffusemask = (texture(Diffusemask, GetLayerposAt(parallaxMap)) * 0.5).xyz;//parallax texture (black / white)
-	vec3 layermasknormal = (texture(layermasknormal, GetLayerposAt(parallaxMap)) * 0.5).xyz;//normalmap for Diffusemask mask based on parallax map
-	vec3 normalmap = texture(normaltexture, GetTopdiffusescaleAt(parallaxMap)).xyz;//normalmap for diffuse top layer texture
-	vec3 normalmapmaksed = normalmap * clamp(Diffusemask * 2.0,0.0,1.0);//remove diffuse normalmap color based on layermask brightness
-	vec3 normalcombined = clamp(layermasknormal + normalmapmaksed,0.0,1.0);//add the adjusted diffuse normal map color to the layermask normal map color
-    normalcombined = normalcombined * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
-    normalcombined.xy *= vec2(1, -1); //flip Y
-    return normalize(tbn * normalcombined);
+	vec3 Diffusemasktex = (texture(Diffusemask, GetLayerposAt(parallaxMap)) * 0.5).xyz;//parallax texture (black / white)
+	vec3 Toplayernormal = (texture(layermasknormal, GetLayerposAt(parallaxMap)) * 0.5).xyz;//normalmap for Diffusemask mask based on parallax map
+	vec3 Normalmap = texture(normaltexture, GetTopdiffusescaleAt(parallaxMap)).xyz;//normalmap for diffuse top layer texture
+	vec3 Normalmapmaksed = Normalmap * clamp(Diffusemasktex * 2.0,0.0,1.0);//remove diffuse normalmap color based on layermask brightness
+	vec3 Normalcombined = clamp(Toplayernormal + Normalmapmaksed,0.0,1.0);//add the adjusted diffuse normal map color to the layermask normal map color
+		 Normalcombined = Normalcombined * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
+		 Normalcombined.xy *= vec2(1.0, -1.0); //flip Y
+    return normalize(tbn * Normalcombined);
 #else
     return normalize(vWorldNormal.xyz);
 #endif

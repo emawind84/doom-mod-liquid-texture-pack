@@ -28,48 +28,56 @@ Material ProcessMaterial()
 	vec2 ParallaxMap = ParallaxMap(tbn);
 	
 	////Masktexture////
-	vec4 Diffusemask = texture(Diffusemask,GetLayerposAt(ParallaxMap));//parallax texture (black / white)
+	vec4 Diffusemasktex = texture(Diffusemask, GetLayerposAt(ParallaxMap));//parallax texture (black / white)
 	
 	////Normaltexture For top layer////
-	vec4 layermasknormal = texture(layermasknormal, GetLayerposAt(ParallaxMap));//normalmap for Diffusemask mask based on parallax map
-	vec4 normalmap = texture(normaltexture, GetTopdiffusescaleAt(ParallaxMap));//normalmap for diffuse top layer texture
+	vec4 Layernormal = texture(layermasknormal, GetLayerposAt(ParallaxMap));//normalmap for Diffusemasktex mask based on parallax map
+	vec4 Normalmap = texture(normaltexture, GetTopdiffusescaleAt(ParallaxMap));//normalmap for diffuse top layer texture
+	vec4 Normalmapslime = (Layernormal + Normalmap) * 0.5;
 	
 	////Normaltexture For bottom layer////
-	vec4 normalmapA = texture(normaltexture, GetNormalLiquidscrollposAt(ParallaxMap)) * 0.25;
-	vec4 normalmapB = texture(normaltexture, GetNormalLiquidscrollnegAt(ParallaxMap)) * 0.25;
-	vec4 normalmapbase = normalmapA + normalmapB;
+	vec4 NormalmapA = texture(normaltexture, GetNormalLiquidscrollposAt(ParallaxMap)) * 0.25;
+	vec4 NormalmapB = texture(normaltexture, GetNormalLiquidscrollnegAt(ParallaxMap)) * 0.25;
+	vec4 Normalmapbase = NormalmapA + NormalmapB;
 	
 	////generate diffuse base texture
-	vec4 DiffuseyposL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.25);//diffuse texture scroll positive and brightness 
-	vec4 DiffuseynegL = texture(Diffuse, (-normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.25);//diffuse texture scroll negetive and brightness 
-	vec4 DiffuseyposXL = texture(Diffuse, (normalmapbase.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.11);//diffuse texture scroll positive and brightness 
-	vec4 DiffuseynegXL = texture(Diffuse, (-normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.11);//diffuse texture scroll negetive and brightness 
-	vec4 DiffuseglowyposXL = texture(Diffuse, (-normalmap.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.25);//glow texture scroll positive and brightness 
-	vec4 DiffuseglowynegXL = texture(Diffuse, (-normalmap.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.11);//glow texture scroll negetive and brightness 
-	vec4 Diffusebase = clamp( DiffuseyposL + DiffuseynegL + DiffuseyposXL + DiffuseynegXL,0.0,1.0);//add diffuse textures togeter for generated effect
+	vec4 DiffuseyposL = texture(Diffuse, (Normalmapbase.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.25);//diffuse texture scroll positive and brightness 
+	vec4 DiffuseynegL = texture(Diffuse, (-Normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.25);//diffuse texture scroll negetive and brightness 
+	vec4 DiffuseyposXL = texture(Diffuse, (Normalmapbase.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.11);//diffuse texture scroll positive and brightness 
+	vec4 DiffuseynegXL = texture(Diffuse, (-Normalmapbase.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.11);//diffuse texture scroll negetive and brightness 
+	vec4 DiffuseglowyposXL = texture(Diffuse, (-Normalmapslime.xy + GetLiquidscrollposAt(ParallaxMap)) * 0.25);//glow texture scroll positive and brightness 
+	vec4 DiffuseglowynegXL = texture(Diffuse, (-Normalmapslime.xy + GetLiquidscrollnegAt(ParallaxMap)) * 0.11);//glow texture scroll negetive and brightness 
+	vec4 Diffusebase = clamp(DiffuseyposL + DiffuseynegL + DiffuseyposXL + DiffuseynegXL,0.0,1.0);//add diffuse textures togeter for generated effect
 	
 	////speculartexture////
-	vec4 spectexture = texture(speculartexture, GetTopdiffusescaleAt(ParallaxMap));
+	vec4 Spectexture = texture(speculartexture, GetTopdiffusescaleAt(ParallaxMap));
 	
 	////generate diffuse top layer////
-	vec4 Diffusetoplayer = spectexture * clamp(Diffusemask * 100.0,0.0,1.0);//top diffuse texture and scale value
-	vec4 UnderGlowblend = clamp(DiffuseglowyposXL + DiffuseglowynegXL * 0.5,0.0,1.0) * Diffusemask;//slime glow
-	vec4 Diffusemasked = clamp(Diffusebase - (clamp(Diffusemask * 15.0,0.0,1.0)),0.0,1.0);
-	vec4 Reflection = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + (normalmap.xy));//////---------------- reflection texture used for fake surface reflection 0.2
-		 Reflection = Reflection * clamp(Diffusetoplayer * Diffusemask * 5.0,0.0,1.0);
-	vec4 diffuselayermasked = clamp(UnderGlowblend + (Diffusetoplayer * 0.5) + Reflection * (clamp(Diffusemask,0.0,1.0)),0.0,1.0);
-	vec4 Diffusefinal = clamp(diffuselayermasked + Diffusemasked,0.0,1.0);
+	vec4 Diffusetoplayer = Spectexture * clamp(Diffusemasktex * 100.0,0.0,1.0);//top diffuse texture and scale value
+	vec4 UnderGlowblend = clamp(DiffuseglowyposXL + DiffuseglowynegXL * 0.5,0.0,1.0) * Diffusemasktex;//slime glow
+	vec4 Diffusemasked = clamp(Diffusebase - (clamp(Diffusemasktex * 15.0,0.0,1.0)),0.0,1.0);
+	
+	////generate reflection////
+	vec4 Reflectionbase = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + (Normalmapslime.xy));//reflection texture used for fake surface reflection 
+	vec4 Reflectionfianl = Reflectionbase * clamp(Diffusetoplayer * Diffusemasktex * 5.0,0.0,1.0);
+	
+	////diffues final////
+	vec4 Diffuselayermasked = clamp(UnderGlowblend + (Diffusetoplayer * 0.5) + Reflectionfianl * (clamp(Diffusemasktex,0.0,1.0)),0.0,1.0);
+	vec4 Diffusefinal = clamp(Diffuselayermasked + Diffusemasked,0.0,1.0);
 	
 	//// generate brightmap texture////
-	vec4 brightmapmask = clamp(Diffusefinal + 0.6 - (clamp(Diffusemask * 20.0,0.0,1.0)) + (clamp(Diffusetoplayer * 8.0 + UnderGlowblend,0.0,1.0)),0.0,1.0);
+	vec4 Brightmapmask = clamp(Diffusefinal + 0.6 - (clamp(Diffusemasktex * 20.0,0.0,1.0)) + (clamp(Diffusetoplayer * 8.0 + UnderGlowblend,0.0,1.0)),0.0,1.0);
 	
 	////generate specular texure masked////
-	vec4 Specfinal = spectexture * clamp((Diffusemask * 4.0),0.0,1.0);//specular texture values multiplied by the diffuse mask texture ( 0.0 = black / 1.0 = white)
+	vec4 Specbasecolor = vec4(0.25, 0.35, 0.15, 1.0);//RGBA Specbaselayercolor color
+	vec4 Spectopcolor = vec4(0.20, 0.27, 0.13, 1.0);//RGBA Spectoplayercolor color
+	vec4 Specbase = clamp((Spectexture * 0.0 + Specbasecolor) - clamp(Diffusemasktex * 5.0,0.0,1.0),0.0,1.0);
+	vec4 Specfinal = clamp((Spectexture * 0.0 + Spectopcolor) * clamp(Diffusemasktex * 5.0,0.0,1.0) + Specbase,0.0,1.0);;//specular texture values multiplied by the diffuse mask texture ( 0.0 = black / 1.0 = white)
 
 	////materials////
 	material.Base = Diffusefinal;
     material.Normal = GetBumpedNormal(tbn, ParallaxMap);
-	material.Bright = brightmapmask; 
+	material.Bright = Brightmapmask; 
 #if defined(SPECULAR)
     material.Specular = Specfinal.rgb;
     material.Glossiness = uSpecularMaterial.x;
@@ -147,14 +155,20 @@ vec2 GetLiquidscrollnegAt(vec2 parallaxMap)//scroll direction for large base tex
 vec3 GetBumpedNormal(mat3 tbn, vec2 parallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 Diffusemask = (texture(Diffusemask,GetLayerposAt(parallaxMap)) * 0.5).xyz;//parallax texture (black / white)
-	vec3 layermasknormal = (texture(layermasknormal, GetLayerposAt(parallaxMap)) * 0.5).xyz;//normalmap for Diffusemask mask based on parallax map
-	vec3 normalmap = texture(normaltexture, GetTopdiffusescaleAt(parallaxMap)).xyz;//normalmap for diffuse top layer texture
-	vec3 normalmapmaksed = normalmap* clamp(Diffusemask * 2.0,0.0,1.0);//remove diffuse normalmap color based on layermask brightness
-	vec3 normalcombined = clamp(layermasknormal + normalmapmaksed,0.0,1.0);//add the adjusted diffuse normal map color to the layermask normal map color
-    normalcombined = normalcombined * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
-    normalcombined.xy *= vec2(1, -1); // flip Y
-    return normalize(tbn * normalcombined);
+	//normalmap top layer
+	vec3 Diffusemasktex = (texture(Diffusemask,GetLayerposAt(parallaxMap))).xyz;//parallax texture (black / white)
+	vec3 Toplayernormal = (texture(layermasknormal, GetLayerposAt(parallaxMap)) * 0.45).xyz;//normalmap for Diffusemask mask based on parallax map
+	vec3 Normalmap = (texture(normaltexture, GetTopdiffusescaleAt(parallaxMap))* 0.55).xyz;//normalmap for diffuse top layer texture
+	vec3 Normalmapmaksed = (Normalmap + Toplayernormal) * clamp(Diffusemasktex * 10.0,0.0,1.0);//remove diffuse normalmap color based on layermask brightness
+	//normalmap bottom layer
+	vec3 NormalmapA = (texture(normaltexture, GetNormalLiquidscrollposAt(parallaxMap))).xyz;
+	vec3 NormalmapB = (texture(normaltexture, GetNormalLiquidscrollnegAt(parallaxMap))).xyz;
+	vec3 Normalmapbase = clamp((NormalmapA + NormalmapB) * 0.5 - clamp(Diffusemasktex * 10.0,0.0,1.0),0.0,1.0);
+	//normalmap combined
+	vec3 Normalcombined = clamp(Normalmapmaksed + Normalmapbase,0.0,1.0);//add the adjusted diffuse normal map color to the layermask normal map color
+		 Normalcombined = Normalcombined * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
+		 Normalcombined.xy *= vec2(0.5, -0.5); // flip Y
+    return normalize(tbn * Normalcombined);
 #else
     return normalize(vWorldNormal.xyz);
 #endif

@@ -52,24 +52,25 @@ Material ProcessMaterial()
 	#endif
 	
 	///generate reflection
-	vec4 Enviro = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + Nmap * 0.45);//reflection texture interat with generated normal texture
-	vec4 reflectionVec4 = clamp(Enviro * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
+	vec4 Reflectionbase = texture(reflection, (normalize(transpose(tbn) * (uCameraPos.xyz - pixelpos.xyz)).xy) + Nmap * 0.45);//reflection texture interat with generated normal texture
+	vec4 Reflectionfinal = clamp(Reflectionbase * reflectioncolor,0.0,1.0);//combine rendered reflection with color tint rgb values
 	
 	////generate diffuse texture
 	vec4 DIffuseypos = texture(Diffuse, GetLiquidscrollposAt(ParallaxMap) * 0.175);//diffuse texture scroll Y positive	and devide brightness in half
 	vec4 DIffuseyneg = texture(Diffuse, GetLiquidscrollposAt(ParallaxMap) * 0.3);//diffuse texture scroll y negetive and devide brightness in half
 	vec4 DIffuselarge = (DIffuseypos + DIffuseyneg) * 0.25;
+	
 	////refact diffuse color
-	vec4 refaction = texture(Diffuse, ((Nmap * (-1.5)) + (GetLiquidscrollnegAt(ParallaxMap) * 0.2))) * 0.50 * refacttint;
-	vec4 DiffuseVec4 = clamp(DIffuselarge + refaction + reflectionVec4,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
+	vec4 Refaction = texture(Diffuse, ((Nmap * (-1.5)) + (GetLiquidscrollnegAt(ParallaxMap) * 0.2))) * 0.50 * refacttint;
+	vec4 Diffusebase = clamp(DIffuselarge + Refaction + Reflectionfinal,0.0,1.0);//add both diffuse textures and refaction togeter for generated scrolling effect at full brightness.
 	
 	////generate liquidfall foam
-	vec4 foam1 = texture(foamlayer, GetTopscrollposAt(ParallaxMap));//foam layer scroll speed
-	vec4 foam2 = texture(foamlayer, GetTopscrollposAt(ParallaxMap) * 2.5);//foam layer scroll speed 
-	vec4 foam = (foam1 + foam2) * foamcolor;//foam color values must stay under 0.5 for a total texture brightness of 1.0 or under.
+	vec4 Foam1 = texture(foamlayer, GetTopscrollposAt(ParallaxMap));//foam layer scroll speed
+	vec4 Foam2 = texture(foamlayer, GetTopscrollposAt(ParallaxMap) * 2.5);//foam layer scroll speed 
+	vec4 Foam = (Foam1 + Foam2) * foamcolor;//foam color values must stay under 0.5 for a total texture brightness of 1.0 or under.
 	
 	//diffuse final color
-	vec4 DIffusefinal = clamp(DiffuseVec4 + foam,0.0,1.0);
+	vec4 DIffusefinal = clamp(Diffusebase + Foam,0.0,1.0);
 	
 	material.Base = DIffusefinal;
     material.Normal = GetBumpedNormal(tbn, ParallaxMap);
@@ -155,12 +156,12 @@ vec2 GetTopscrollposAt(vec2 parallaxMap)//scroll direction for foam texture
 vec3 GetBumpedNormal(mat3 tbn, vec2 ParallaxMap)
 {
 #if defined(NORMALMAP)
-	vec3 normalmapA = texture(normaltexture, GetLiquidscrollposAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
-	vec3 normalmapB = texture(normaltexture, GetLiquidscrollnegAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
-	vec3 normalmap = (normalmapA + normalmapB) * 0.5;
-    normalmap = normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
-    normalmap.xy *= vec2(1, -1); //flip Y
-    return normalize(tbn * normalmap);
+	vec3 NormalmapA = texture(normaltexture, GetLiquidscrollposAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
+	vec3 NormalmapB = texture(normaltexture, GetLiquidscrollnegAt(ParallaxMap)).xyz;//normalmap for diffuse top layer texture
+	vec3 Normalmap = (NormalmapA + NormalmapB) * 0.5;
+		 Normalmap = Normalmap * 255./127. - 128./127.; // Math so "odd" because 0.5 cannot be precisely described in an unsigned format
+		 Normalmap.xy *= vec2(1.0, -1.0); //flip Y
+    return normalize(tbn * Normalmap);
 #else
     return normalize(vWorldNormal.xyz);
 #endif
