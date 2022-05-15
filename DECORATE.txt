@@ -55,7 +55,7 @@ ACTOR LiquidRipple
 ACTOR LTPLavaChunk :LTPCoreSplashChunk
 {
 	gravity 0.7
-	renderstyle AddShaded // treats black on the texture as transparent and white as full opacity
+	renderstyle shaded // treats black on the texture as transparent and white as full opacity
 	Alpha 1.0
 	stencilcolor "fd7900"//HEX color found in gimp color selector in ther HTML notation box.
 	+FLATSPRITE
@@ -366,7 +366,7 @@ Actor LTPToxicChunk : LTPCoreSplashChunk
 {
 	gravity 0.7
 	Alpha 1.0
-	renderstyle AddShaded // treats black on the texture as transparent and white as full opacity
+	renderstyle shaded // treats black on the texture as transparent and white as full opacity
 	stencilcolor "4dde01"//HEX color found in gimp color selector in ther HTML notation box.
 	+FLATSPRITE
 	States
